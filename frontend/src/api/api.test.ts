@@ -80,11 +80,23 @@ describe('API Module', () => {
    *
    * Indice: Regardez le test "creates a new task" ci-dessus pour vous inspirer
    */
-  it.todo('deletes a task', async () => {
+  it('deletes a task', async () => {
     // TODO: Votre code ici
     // 1. Mocker fetch pour retourner { ok: true, status: 204 }
+    (globalThis as any).fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        status: 204,
+      })
+    );
+
     // 2. Appeler await api.deleteTask(1)
+    await api.deleteTask(1);
+
     // 3. Vérifier que fetch a été appelé avec '/tasks/1' et method: 'DELETE'
+    expect((globalThis as any).fetch).toHaveBeenCalledWith('/api/tasks/1', expect.objectContaining({
+      method: 'DELETE',
+    }));
   });
 
   /**
@@ -101,10 +113,22 @@ describe('API Module', () => {
    *
    * Indice: C'est similaire au test "creates a new task" mais avec PUT au lieu de POST
    */
-  it.todo('updates a task', async () => {
+  it('updates a task', async () => {
     // TODO: Votre code ici
     // 1. Mocker fetch pour retourner { ok: true, json: () => Promise.resolve({ id: 1, title: 'Updated Title', ... }) }
+    (globalThis as any).fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ id: 1, title: 'Updated Title', status: 'todo' }),
+      })
+    );
     // 2. Appeler await api.updateTask(1, { title: 'Updated Title' })
+    const updated = await api.updateTask(1, { title: 'Updated Title' });
     // 3. Vérifier que fetch a été appelé avec '/tasks/1', method: 'PUT', et body contenant le titre
+    expect((globalThis as any).fetch).toHaveBeenCalledWith('/api/tasks/1', expect.objectContaining({
+      method: 'PUT',
+      body: JSON.stringify({ title: 'Updated Title' }),
+    }));
+    expect(updated.title).toBe('Updated Title');
   });
 });

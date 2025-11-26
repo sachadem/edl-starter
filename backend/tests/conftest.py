@@ -11,7 +11,7 @@ def clean_tasks():
     """
     clear_tasks()
     yield
-    clear_tasks()
+    clear_tasks()   
 
 
 @pytest.fixture
