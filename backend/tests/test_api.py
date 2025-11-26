@@ -35,9 +35,7 @@ def test_root_endpoint(client):
 
 
 def test_health_check(client):
-    """EXEMPLE : Un autre test de point de terminaison GET simple."""
     response = client.get("/health")
-
     assert response.status_code == 200
     assert response.json()["status"] == "healthy"  # ✅ Correct
 
