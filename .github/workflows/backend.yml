@@ -2,36 +2,64 @@ name: Backend Tests
 
 on:
   push:
-    branches: [main, feature/test-branch-protection]
-  pull_request:  # ✨ Nouveau !
     branches: [main]
-  workflow_call:  # ✨ Nouveau !
+  pull_request:
+    branches: [main]
+  workflow_call:
+
 jobs:
-  test:
+  unit-tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      # TODO : Setup Python 3.11 avec cache pip
-      - name: Setup Python 3.11 avec cache pip
-        uses: actions/setup-python@v6
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
         with:
-            python-version: '3.11'
-            cache: 'pip'
+          python-version: '3.11'
+          cache: 'pip'
 
-
-      # TODO : Installez UV avec pip
-      - name: Installation de uv avec pip
+      - name: 📦 Install UV
         run: pip install uv
 
-      # TODO : Installez les dépendances (cd backend && uv sync)
-      - name: Installation des rqrmts
-        working-directory: ./backend   
-        run: uv sync    
-      # TODO : Lancez les tests
-      - name: Lancement des tests
+      - name: 📚 Install dependencies
         run: |
-                cd backend
-                uv run pytest -v --cov
+          cd backend
+          uv sync
+
+      - name: 🧪 Run unit tests only
+        run: |
+          cd backend
+          uv run pytest -v -m "not e2e"
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # ✨ Seulement sur main !
+    needs: unit-tests
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 📦 Install UV
+        run: pip install uv
+
+      - name: 📚 Install dependencies
+        run: |
+          cd backend
+          uv sync
+
+      - name: 🧪 Run E2E tests only
+        run: |
+          cd backend
+          uv run pytest -v -m "e2e"

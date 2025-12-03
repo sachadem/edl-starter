@@ -9,7 +9,7 @@ Structure de chaque test :
 3. ASSERT - Vérifier la réponse
 """
 
-from tests.conftest import client
+#from tests.conftest import client
 import pytest
 
 
